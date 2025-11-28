@@ -26,7 +26,6 @@ struct GuestShare:Identifiable{
         itemsSubtotal: Double,
         taxAmount: Double,
         tipAmount: Double,
-        totalOwed: Double,
         itemsOrdered: [BillItem]
     ){
         self.id = id
@@ -34,7 +33,7 @@ struct GuestShare:Identifiable{
         self.itemsSubtotal = itemsSubtotal
         self.taxAmount = taxAmount
         self.tipAmount = tipAmount
-        self.totalOwed = totalOwed
+        self.totalOwed = itemsSubtotal + taxAmount + tipAmount
         self.itemsOrdered = itemsOrdered
     }
 }

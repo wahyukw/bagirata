@@ -77,6 +77,40 @@ class BagirataTests: XCTestCase {
         XCTAssertThrowsError(try calculator.calculateSplit(for: bill)){error in
             XCTAssertEqual(error as? BillCalculationError, .unassignedItems)
         }
+    }
+    
+    func testSimpleEqualSplit(){
+        //Arrange: $20 item split, no tax, no tip
+        let guest1 = Guest(name: "John")
+        let guest2 = Guest(name: "Doe")
         
+        let item = BillItem(name: "Pizza",
+                            price: 20.0,
+                            assignedTo: [guest1, guest2]
+        )
+        
+        let bill = Bill(
+            taxAmount: 0,
+            tipAmount: 0,
+            guests: [guest1, guest2],
+            items: [item]
+        )
+        //Act
+        let results = try! calculator.calculateSplit(for: bill)
+        
+        //Assert: Each guest should owe $10
+        XCTAssertEqual(results.count, 2)
+        
+        let aliceShare = results.first{$0.guest.id == guest1.id}!
+        XCTAssertEqual(aliceShare.itemsSubtotal, 10.0)
+        XCTAssertEqual(aliceShare.taxAmount, 0.0)
+        XCTAssertEqual(aliceShare.tipAmount, 0.0)
+        XCTAssertEqual(aliceShare.totalOwed, 10.0)
+        
+        let bobShare = results.first{$0.guest.id == guest2.id}!
+        XCTAssertEqual(bobShare.itemsSubtotal, 10.0)
+        XCTAssertEqual(bobShare.taxAmount, 0.0)
+        XCTAssertEqual(bobShare.tipAmount, 0.0)
+        XCTAssertEqual(bobShare.totalOwed, 10.0)
     }
 }
