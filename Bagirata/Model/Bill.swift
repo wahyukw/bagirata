@@ -30,6 +30,12 @@ struct Bill:Identifiable{
         !guests.isEmpty &&
         items.allSatisfy{$0.isAssigned}
     }
+    //Returns the guests who are involved in this bill
+    var activeGuests: [Guest]{
+        guests.filter{ guest in
+            items.contains{$0.assignedTo.contains(guest)}
+        }
+    }
     
     init(
         id: UUID = UUID(),

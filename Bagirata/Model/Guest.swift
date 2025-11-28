@@ -9,7 +9,6 @@ import Foundation
 
 struct Guest: Identifiable, Hashable, Equatable {
     let id: UUID
-    
     var name: String
     var avatarImg: String
     

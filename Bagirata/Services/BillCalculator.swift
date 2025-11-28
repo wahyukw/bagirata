@@ -14,6 +14,10 @@ protocol BillCalculatorProtocol{
 
 class BillCalculator:BillCalculatorProtocol{
     func calculateSplit(for bill: Bill) throws -> [GuestShare] {
+        guard !bill.items.isEmpty else {
+            throw BillCalculationError.noItems
+        }
+        
         return []
     }
 }
