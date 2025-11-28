@@ -64,4 +64,3 @@ class BillCalculator:BillCalculatorProtocol{
         return guestShares
     }
 }
-

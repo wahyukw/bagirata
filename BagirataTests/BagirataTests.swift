@@ -217,4 +217,55 @@ class BagirataTests: XCTestCase {
         XCTAssertEqual(shaqShare.totalOwed, 0.0)
         XCTAssertTrue(shaqShare.didNotOrder)
     }
+    func testRealWorldApplication(){
+        //Arrange
+        let john = Guest(name: "John")
+        let doe = Guest(name: "Doe")
+        let wahyu = Guest(name: "Wahyu")
+        
+        //Fries split john + doe
+        let fries = BillItem(name:"Fries",
+                             price: 12.50,
+                             assignedTo: [john, doe]
+        )
+        let milkshake = BillItem(name:"Milkshake",
+                                 price: 4.00,
+                                 assignedTo: [john]
+        )
+        let burger = BillItem(name:"Burger",
+                              price: 10.00,
+                              assignedTo: [wahyu]
+        )
+        
+        let bill = Bill(
+            taxAmount: 2.915, //11% tax
+            tipAmount: 5.00,
+            guests: [john, doe, wahyu],
+            items:[fries, milkshake, burger]
+        )
+        //Act
+        let results = try! calculator.calculateSplit(for: bill)
+        
+        //Assert
+        XCTAssertEqual(results.count, 3)
+        
+        let johnShare = results.first{$0.guest.id == john.id}!
+        XCTAssertEqual(johnShare.itemsSubtotal, 10.25, accuracy: 0.01)
+        XCTAssertEqual(johnShare.taxAmount, 1.1278, accuracy: 0.01)
+        XCTAssertEqual(johnShare.tipAmount, 1.67, accuracy: 0.01)
+        
+        let doeShare = results.first{$0.guest.id == doe.id}!
+        XCTAssertEqual(doeShare.itemsSubtotal, 6.25, accuracy: 0.01)
+        XCTAssertEqual(doeShare.taxAmount, 0.687, accuracy: 0.01)
+        XCTAssertEqual(doeShare.tipAmount, 1.67, accuracy: 0.01)
+        
+        let wahyuShare = results.first{$0.guest.id == wahyu.id}!
+        XCTAssertEqual(wahyuShare.itemsSubtotal, 10.0, accuracy: 0.01)
+        XCTAssertEqual(wahyuShare.taxAmount, 1.0995, accuracy: 0.01)
+        XCTAssertEqual(wahyuShare.tipAmount, 1.67, accuracy: 0.01)
+        
+        let grandTotal = johnShare.totalOwed + doeShare.totalOwed + wahyuShare.totalOwed
+        let expectedBill = bill.subtotal + bill.taxAmount + bill.tipAmount
+        XCTAssertEqual(grandTotal, expectedBill, accuracy: 0.01)
+    }
 }
