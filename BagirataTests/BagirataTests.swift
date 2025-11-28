@@ -57,4 +57,26 @@ class BagirataTests: XCTestCase {
             XCTAssertEqual(error as? BillCalculationError, .noGuests)
         }
     }
+    
+    func testCalculationItemsUnassigned(){
+        //Arrange: Create bill with items but not guests assigned to the item
+        let guest1 = Guest(name: "John")
+        let guest2 = Guest(name: "Doe")
+        
+        let item1 = BillItem(name: "Pizza", price: 20.0, assignedTo: [])
+        let item2 = BillItem(name: "Soda", price: 5.0, assignedTo: [])
+        
+        let bill = Bill(
+            taxAmount: 5.0,
+            tipAmount: 10.0,
+            guests: [guest1, guest2],
+            items: [item1, item2]
+            )
+        
+        //Act & Assert: Should throw unassignedItems error
+        XCTAssertThrowsError(try calculator.calculateSplit(for: bill)){error in
+            XCTAssertEqual(error as? BillCalculationError, .unassignedItems)
+        }
+        
+    }
 }

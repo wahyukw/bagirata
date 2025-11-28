@@ -14,12 +14,17 @@ protocol BillCalculatorProtocol{
 
 class BillCalculator:BillCalculatorProtocol{
     func calculateSplit(for bill: Bill) throws -> [GuestShare] {
+        //Check if bill has no items
         guard !bill.items.isEmpty else {
             throw BillCalculationError.noItems
         }
-        
+        //Check if bill has no guests
         guard !bill.guests.isEmpty else {
             throw BillCalculationError.noGuests
+        }
+        //Check if item is unassigned
+        guard bill.items.allSatisfy({$0.isAssigned}) else {
+            throw BillCalculationError.unassignedItems
         }
         
         return []
