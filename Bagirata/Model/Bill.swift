@@ -1,0 +1,51 @@
+//
+//  Bill.swift
+//  Bagirata
+//
+//  Created by Wahyu K on 28/11/2025.
+//
+
+import Foundation
+
+struct Bill:Identifiable{
+    let id: UUID
+    var name: String?
+    var date: Date
+    var taxAmount: Double
+    var tipAmount: Double
+    var guests: [Guest]
+    var items: [BillItem]
+    
+    //Sum of all item prices before tax and tip
+    var subtotal: Double{
+        items.reduce(0){$0 + $1.price}
+    }
+    //Sum of the bill including tax and tip
+    var total: Double{
+        subtotal+taxAmount+tipAmount
+    }
+    //Logic to check if items is empty, guest is empty, and each item have at least 1 assigned guest
+    var canCalculate: Bool{
+        !items.isEmpty &&
+        !guests.isEmpty &&
+        items.allSatisfy{$0.isAssigned}
+    }
+    
+    init(
+        id: UUID = UUID(),
+        name: String? = nil,
+        date: Date = Date(),
+        taxAmount: Double = 0,
+        tipAmount: Double = 0,
+        guests: [Guest] = [],
+        items: [BillItem] = []
+    ){
+        self.id = id
+        self.name = name
+        self.date = date
+        self.taxAmount = taxAmount
+        self.tipAmount = tipAmount
+        self.guests = guests
+        self.items = items
+    }
+}

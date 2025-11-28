@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import SwiftData
+
 
 @main
 struct BagirataApp: App {
