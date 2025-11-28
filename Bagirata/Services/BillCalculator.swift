@@ -18,6 +18,10 @@ class BillCalculator:BillCalculatorProtocol{
             throw BillCalculationError.noItems
         }
         
+        guard !bill.guests.isEmpty else {
+            throw BillCalculationError.noGuests
+        }
+        
         return []
     }
 }
