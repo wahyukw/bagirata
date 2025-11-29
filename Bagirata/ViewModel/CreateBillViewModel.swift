@@ -11,7 +11,7 @@ import SwiftUI
 @Observable
 class CreateBillViewModel{
     var items: [BillItem] = []
-    var taxAmount: String = ""
+    var taxRate: Double = 0.11
     var tipAmount: String = ""
     var billName: String = ""
     
@@ -19,8 +19,8 @@ class CreateBillViewModel{
         items.reduce(0){$0 + $1.price}
     }
     
-    var taxAmountDouble: Double {
-        Double(taxAmount) ?? 0
+    var taxAmount: Double {
+        subtotal*taxRate
     }
     
     var tipAmountDouble: Double {
@@ -28,7 +28,7 @@ class CreateBillViewModel{
     }
     
     var total: Double {
-        subtotal + taxAmountDouble + tipAmountDouble
+        subtotal + taxAmount + tipAmountDouble
     }
     
     var canProceed: Bool {
@@ -36,13 +36,21 @@ class CreateBillViewModel{
     }
     
     func addItem(name: String, price: Double){
-        
+        let newItem = BillItem(name: name, price: price)
+        items.append(newItem)
     }
     
     func removeItem(at index: Int){
-        
+        items.remove(at: index)
     }
     func createBill() -> Bill {
-        return Bill()
+        return Bill(
+            name: billName.isEmpty ? nil: billName,
+            date: Date(),
+            taxAmount: taxAmount,
+            tipAmount: tipAmountDouble,
+            guests: [],
+            items: items
+        )
     }
 }
