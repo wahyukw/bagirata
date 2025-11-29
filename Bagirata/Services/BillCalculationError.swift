@@ -2,7 +2,7 @@
 //  BillCalculationError.swift
 //  Bagirata
 //
-//  Created by Moladin on 28/11/2025.
+//  Created by Wahyu K on 28/11/2025.
 //
 
 import Foundation
