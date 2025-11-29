@@ -8,7 +8,7 @@
 import XCTest
 @testable import Bagirata
 
-class BagirataTests: XCTestCase {
+final class BagirataTests: XCTestCase {
 
     var calculator: BillCalculator!
     
