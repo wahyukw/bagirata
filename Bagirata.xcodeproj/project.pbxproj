@@ -40,7 +40,7 @@
 			path = BagirataUITests;
 			sourceTree = "<group>";
 		};
-		82EDCF782EDAAA6A00A69743 /* Bagirata */ = {
+		82C6CF5E2EDC2F4E00818010 /* Bagirata */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Bagirata;
 			sourceTree = "<group>";
@@ -75,7 +75,7 @@
 		822553F82ED8D87000789B83 = {
 			isa = PBXGroup;
 			children = (
-				82EDCF782EDAAA6A00A69743 /* Bagirata */,
+				82C6CF5E2EDC2F4E00818010 /* Bagirata */,
 				822554132ED8D87100789B83 /* BagirataTests */,
 				8225541D2ED8D87100789B83 /* BagirataUITests */,
 				822554022ED8D87000789B83 /* Products */,
@@ -108,7 +108,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				82EDCF782EDAAA6A00A69743 /* Bagirata */,
+				82C6CF5E2EDC2F4E00818010 /* Bagirata */,
 			);
 			name = Bagirata;
 			packageProductDependencies = (

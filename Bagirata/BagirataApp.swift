@@ -14,7 +14,7 @@ struct BagirataApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView()
         }
         
     }
