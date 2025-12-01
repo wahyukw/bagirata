@@ -17,12 +17,12 @@ struct CreateBillView: View {
             AddItemsView(navigationPath: $navigationPath,
                          onComplete: onComplete
             )
-            /*.navigationDestination(for: Bill.self){ bill in
+            .navigationDestination(for: Bill.self){ bill in
                 AddGuestsView(bill: bill,
                               navigationPath: $navigationPath,
                               onComplete: onComplete
                 )
-            }*/
+            }
         }
     }
 }

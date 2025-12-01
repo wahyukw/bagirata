@@ -12,8 +12,6 @@ import SwiftUI
 class GuestViewModel{
     var  bill: Bill
     
-    private let availableAvatars = ["avatar1", "avatar2", "avatar3", "avatar4", "avatar5", "avatar6"]
-    
     var guests: [Guest] {
         bill.guests
     }
@@ -65,7 +63,7 @@ class GuestViewModel{
     }
     
     private func getRandomAvatar() -> String{
-        let randomNumber = Int.random(in: 1...availableAvatars.count)
+        let randomNumber = Int.random(in: 1...6)
         return "avatar\(randomNumber)"
     }
 }

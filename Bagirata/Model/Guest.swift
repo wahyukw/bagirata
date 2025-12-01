@@ -15,7 +15,7 @@ struct Guest: Identifiable, Hashable, Equatable {
     init(
         id: UUID = UUID(),
         name: String,
-        avatarImg: String = "defaultAvatar"
+        avatarImg: String = "avatar1"
     ){
         self.id = id
         self.name = name
