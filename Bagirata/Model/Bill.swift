@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Bill:Identifiable{
+struct Bill:Identifiable, Hashable{
     let id: UUID
     var name: String?
     var date: Date

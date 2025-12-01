@@ -2,7 +2,7 @@
 //  BillCardView.swift
 //  Bagirata
 //
-//  Created by Moladin on 1/12/2025.
+//  Created by Wahyu K on 1/12/2025.
 //
 
 import SwiftUI

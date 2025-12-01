@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct BillItem: Identifiable, Equatable {
+struct BillItem: Identifiable, Equatable, Hashable {
     let id: UUID
     var name: String
     var price: Double
