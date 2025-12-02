@@ -25,15 +25,20 @@ struct AddGuestsView: View {
     }
     
     var body: some View {
+        
+        VStack(spacing: 12){
+            instructionsSection
+            addGuestSection
+        }
+        .padding()
         ScrollView(showsIndicators: false){
             VStack(spacing: 12){
-                instructionsSection
-                addGuestSection
                 guestsListSection
-                nextButton
             }
-            .padding()
+            .padding(.horizontal)
         }
+        nextButton
+            .padding()
         .navigationTitle("Add Guests")
         .navigationBarTitleDisplayMode(.inline)
         .alert("Error", isPresented: $showError){
@@ -146,7 +151,7 @@ struct AddGuestsView: View {
     }
     
     private func goToAssignItems(){
-        navigationPath.append(viewModel.bill)
+        navigationPath.append(AssignItemsStep(bill: viewModel.bill))
     }
 }
 

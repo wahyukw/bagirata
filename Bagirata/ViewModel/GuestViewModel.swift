@@ -46,7 +46,13 @@ class GuestViewModel{
     }
     
     func removeGuest(at index: Int){
+        let removedGuest = bill.guests[index]
+        
         bill.guests.remove(at: index)
+        
+        for i in 0..<bill.items.count{
+            bill.items[i].assignedTo.removeAll{ $0.id == removedGuest.id }
+        }
     }
     
     func isNameValid(_ name: String) -> Bool{

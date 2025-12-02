@@ -45,7 +45,7 @@ class CreateBillViewModel{
     }
     func createBill() -> Bill {
         return Bill(
-            name: billName.isEmpty ? nil: billName,
+            name: billName.isEmpty ? nil : billName,
             date: Date(),
             taxAmount: taxAmount,
             tipAmount: tipAmountDouble,

@@ -101,4 +101,22 @@ final class GuestViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.bill.guests[0].name, "John")
         XCTAssertEqual(viewModel.bill.guests[1].name, "Wahyu")
     }
+    
+    func testRemoveGuestAlsoRemovesFromAssignedItems(){
+        //Arrange
+        viewModel.addGuest(name: "John")
+        viewModel.addGuest(name: "Doe")
+        
+        let john = viewModel.bill.guests[0]
+        viewModel.bill.items[0].assignedTo.append(john)
+        
+        XCTAssertEqual(viewModel.bill.items[0].assignedTo.count, 1)
+        
+        //Act
+        viewModel.removeGuest(at: 0)
+        
+        //Assert
+        XCTAssertEqual(viewModel.bill.guests.count, 1)
+        XCTAssertTrue(viewModel.bill.items[0].assignedTo.isEmpty)
+    }
 }

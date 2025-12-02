@@ -17,15 +17,24 @@ struct CreateBillView: View {
             AddItemsView(navigationPath: $navigationPath,
                          onComplete: onComplete
             )
-            .navigationDestination(for: Bill.self){ bill in
-                AddGuestsView(bill: bill,
+            .navigationDestination(for: AddGuestsStep.self){ step in
+                AddGuestsView(bill: step.bill,
                               navigationPath: $navigationPath,
                               onComplete: onComplete
+                )
+            }
+            .navigationDestination(for: AssignItemsStep.self){ step in
+                AssignItemsView(bill: step.bill,
+                                navigationPath: $navigationPath,
+                                onComplete: onComplete
                 )
             }
         }
     }
 }
+
+struct AddGuestsStep: Hashable { let bill: Bill }
+struct AssignItemsStep: Hashable { let bill: Bill }
 
 #Preview {
     CreateBillView(onComplete: { _ in })

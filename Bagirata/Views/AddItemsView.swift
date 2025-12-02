@@ -193,7 +193,7 @@ struct AddItemsView: View {
     
     private func goToAddGuests(){
         let bill = viewModel.createBill()
-        navigationPath.append(bill)
+        navigationPath.append(AddGuestsStep(bill:bill))
     }
 }
 
