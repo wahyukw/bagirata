@@ -151,7 +151,7 @@ struct AddGuestsView: View {
     }
     
     private func goToAssignItems(){
-        navigationPath.append(AssignItemsStep(bill: viewModel.bill))
+        navigationPath.append(viewModel.bill)
     }
 }
 
