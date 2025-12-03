@@ -17,7 +17,7 @@ struct AssignItemsView: View {
         VStack(spacing: 16){
             instructionsSection
             ScrollView(showsIndicators: false) {
-                    itemsSection
+                itemsSection
             }
             calculateButton
         }
@@ -25,9 +25,7 @@ struct AssignItemsView: View {
         .navigationTitle("Assign Items")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if viewModel == nil {
-                viewModel = AssignItemsViewModel(bill: billState.bill)
-            }
+            viewModel = AssignItemsViewModel(bill: billState.bill)
         }
     }
     
@@ -57,7 +55,7 @@ struct AssignItemsView: View {
     private var itemsSection: some View{
         LazyVStack(spacing: 16){
             if let vm = viewModel{
-                ForEach(viewModel!.bill.items){ item in
+                ForEach(vm.bill.items){ item in
                     ItemAssignmentCard(
                         item: item,
                         guests: vm.bill.guests,

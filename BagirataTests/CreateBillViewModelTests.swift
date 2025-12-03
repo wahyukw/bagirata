@@ -87,27 +87,29 @@ final class CreateBillViewModelTests: XCTestCase {
     
     func testCreateBill(){
         //Arrange
+        let bill = Bill()
+        
         viewModel.addItem(name: "Cola", price: 2.0)
         viewModel.addItem(name: "Sprite", price: 3.0)
         viewModel.tipAmount = "5.0"
         viewModel.billName = "Dinner at John's"
         
         //Act
-        let bill = viewModel.createBill()
+        let updatedBill = viewModel.createBill(bill: bill)
         
         //Assert
-        XCTAssertEqual(bill.items.count, 2)
-        XCTAssertEqual(bill.items[0].name, "Cola")
-        XCTAssertEqual(bill.items[1].name, "Sprite")
+        XCTAssertEqual(updatedBill.items.count, 2)
+        XCTAssertEqual(updatedBill.items[0].name, "Cola")
+        XCTAssertEqual(updatedBill.items[1].name, "Sprite")
         
-        XCTAssertEqual(bill.subtotal, 5.0)
-        XCTAssertEqual(bill.taxAmount, 0.55, accuracy: 0.01)
-        XCTAssertEqual(bill.tipAmount, 5.0)
-        XCTAssertEqual(bill.total, 10.55, accuracy: 0.01)
+        XCTAssertEqual(updatedBill.subtotal, 5.0)
+        XCTAssertEqual(updatedBill.taxAmount, 0.55, accuracy: 0.01)
+        XCTAssertEqual(updatedBill.tipAmount, 5.0)
+        XCTAssertEqual(updatedBill.total, 10.55, accuracy: 0.01)
         
-        XCTAssertEqual(bill.name, "Dinner at John's")
-        XCTAssertTrue(bill.guests.isEmpty)
+        XCTAssertEqual(updatedBill.name, "Dinner at John's")
+        XCTAssertTrue(updatedBill.guests.isEmpty)
         
-        XCTAssertEqual(bill.date.timeIntervalSinceNow, 0, accuracy: 1.0)
+        XCTAssertEqual(updatedBill.date.timeIntervalSinceNow, 0, accuracy: 1.0)
     }
 }
