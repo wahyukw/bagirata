@@ -32,7 +32,8 @@ class CreateBillViewModel{
     }
     
     var canProceed: Bool {
-        !items.isEmpty
+        !items.isEmpty &&
+        (tipAmount.isEmpty || Double(tipAmount) != nil)
     }
     
     func addItem(name: String, price: Double){
