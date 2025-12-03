@@ -8,37 +8,34 @@
 import SwiftUI
 
 struct CreateBillView: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var navigationPath = NavigationPath()
+    @State private var billState = BillState()
+    
     let onComplete: (Bill) -> Void
     
+    @State private var path = NavigationPath()
+    
     var body: some View {
-        NavigationStack(path: $navigationPath){
-            AddItemsView(navigationPath: $navigationPath,
-                         onComplete: onComplete
-            )
-            .navigationDestination(for: Bill.self){ bill in
-                
-                if bill.guests.isEmpty{
-                    AddGuestsView(bill: bill,
-                                  navigationPath: $navigationPath,
-                                  onComplete: onComplete
+        NavigationStack(path: $path){
+            AddItemsView()
+            .navigationDestination(for: String.self){ destination in
+                switch destination {
+                case "addGuests":
+                    AddGuestsView()
+                case "assignItems":
+                    AssignItemsView()
+                case "results":
+                    ResultsView(
+                        bill: billState.bill,
+                        onComplete: { finalBill in
+                            onComplete(finalBill)
+                            path = NavigationPath()
+                        }
                     )
-                } else if !bill.canCalculate{
-                    AssignItemsView(bill: bill,
-                                    navigationPath: $navigationPath,
-                                    onComplete: onComplete)
-                }else{
-//                    ResultsView(bill: bill,
-//                                navigationPath: $navigationPath,
-//                                onComplete: onComplete
-//                    )
+                default:
+                    EmptyView()
                 }
             }
         }
+        .environment(billState)
     }
-}
-
-#Preview {
-    CreateBillView(onComplete: { _ in })
 }

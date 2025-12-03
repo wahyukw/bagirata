@@ -9,31 +9,26 @@ import SwiftUI
 
 struct AssignItemsView: View {
     
-    @State private var viewModel: AssignItemsViewModel
-    @Binding var navigationPath: NavigationPath
-    let onComplete: (Bill) -> Void
+    @Environment(BillState.self) private var billState
     
-    @Environment(\.dismiss) private var dismiss
-    
-    init(bill: Bill, navigationPath: Binding<NavigationPath>, onComplete: @escaping (Bill) -> Void){
-        _viewModel = State(initialValue: AssignItemsViewModel(bill: bill))
-        _navigationPath = navigationPath
-        self.onComplete = onComplete
-    }
+    @State private var viewModel: AssignItemsViewModel?
     
     var body: some View {
-        instructionsSection
-            .padding()
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 16){
-                itemsSection
+        VStack(spacing: 16){
+            instructionsSection
+            ScrollView(showsIndicators: false) {
+                    itemsSection
             }
-            .padding(.horizontal)
+            calculateButton
         }
-        calculateButton
-            .padding()
+        .padding()
         .navigationTitle("Assign Items")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            if viewModel == nil {
+                viewModel = AssignItemsViewModel(bill: billState.bill)
+            }
+        }
     }
     
     private var instructionsSection: some View{
@@ -44,14 +39,16 @@ struct AssignItemsView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             
-            if !viewModel.canCalculate{
-                Label{
-                    Text(viewModel.validationMessage ?? "")
-                } icon: {
-                    Image(systemName: "exclamationmark.triangle.fill")
+            if let vm = viewModel {
+                if !vm.canCalculate{
+                    Label{
+                        Text(vm.validationMessage ?? "")
+                    } icon: {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.orange)
                 }
-                .font(.subheadline)
-                .foregroundStyle(.orange)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -59,56 +56,36 @@ struct AssignItemsView: View {
     
     private var itemsSection: some View{
         LazyVStack(spacing: 16){
-            ForEach(viewModel.bill.items){ item in
-                ItemAssignmentCard(
-                    item: item,
-                    guests: viewModel.bill.guests,
-                    viewModel: viewModel
-                )
+            if let vm = viewModel{
+                ForEach(viewModel!.bill.items){ item in
+                    ItemAssignmentCard(
+                        item: item,
+                        guests: vm.bill.guests,
+                        viewModel: vm
+                    )
+                }
+            }else {
+                ProgressView("Loading...")
             }
+            
         }
     }
     
     private var calculateButton: some View{
-        Button{
-            calculateSplit()
-        } label: {
+        NavigationLink(value: "results") {
             Text("Calculate Split")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(viewModel.canCalculate ? Color.black : Color.gray)
+                .background((viewModel?.canCalculate ?? false) ? Color.black : Color.gray)
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .disabled(!viewModel.canCalculate)
-    }
-    
-    private func calculateSplit(){
-        navigationPath.append(viewModel.bill)
-    }
-}
-
-#Preview {
-    let john = Guest(name: "John", avatarImg: "avatar1")
-    let sarah = Guest(name: "Sarah", avatarImg: "avatar2")
-    
-    let pizza = BillItem(name: "Pizza", price: 20.0, assignedTo: [])
-    let burger = BillItem(name: "Burger", price: 15.0, assignedTo: [])
-    
-    let bill = Bill(
-        name: "Test Bill",
-        taxAmount: 3.85,
-        tipAmount: 5.0,
-        guests: [john, sarah],
-        items: [pizza, burger]
-    )
-    
-    return NavigationStack {
-        AssignItemsView(
-            bill: bill,
-            navigationPath: .constant(NavigationPath()),
-            onComplete: { _ in }
-        )
+        .disabled(!(viewModel?.canCalculate ?? false))
+        .simultaneousGesture(TapGesture().onEnded {
+            if let vm = viewModel, vm.canCalculate {
+                billState.bill = vm.bill
+            }
+        })
     }
 }

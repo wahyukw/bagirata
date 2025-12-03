@@ -10,8 +10,6 @@ import SwiftUI
 
 @main
 struct BagirataApp: App {
-    
-
     var body: some Scene {
         WindowGroup {
             HomeView()
