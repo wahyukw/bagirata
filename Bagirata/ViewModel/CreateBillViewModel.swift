@@ -44,14 +44,25 @@ class CreateBillViewModel{
     func removeItem(at index: Int){
         items.remove(at: index)
     }
-    func createBill() -> Bill {
-        return Bill(
-            name: billName.isEmpty ? nil : billName,
-            date: Date(),
-            taxAmount: taxAmount,
-            tipAmount: tipAmountDouble,
-            guests: [],
-            items: items
-        )
+    func createBill(bill: Bill) -> Bill {
+        var updatedBill = bill
+        
+        updatedBill.name = self.billName
+        updatedBill.items = self.items
+        updatedBill.taxAmount = self.taxAmount
+        updatedBill.tipAmount = self.tipAmountDouble
+        
+        return updatedBill
+    }
+    func load(bill: Bill) {
+        let loadedName = bill.name ?? ""
+        
+        if loadedName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            self.billName = "Unnamed Bill"
+        } else {
+            self.billName = loadedName
+        }
+        
+        self.items = bill.items
     }
 }

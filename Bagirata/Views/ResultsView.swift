@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ResultsView: View {
+    @Environment(\.dismiss) private var dismiss
     
     let bill: Bill
     let onComplete: (Bill) -> Void
@@ -34,6 +35,7 @@ struct ResultsView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done") {
                     onComplete(bill)
+                    dismiss()
                 }
             }
         }
@@ -57,7 +59,7 @@ struct ResultsView: View {
     
     private func totalBillSection(vm: ResultsViewModel) -> some View{
         VStack(spacing: 8) {
-            Text("Total Bill")
+            Text((vm.bill.name?.trimmingCharacters(in: .whitespacesAndNewlines)).flatMap { $0.isEmpty ? nil : $0 } ?? "Unnamed Bill")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             

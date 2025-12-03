@@ -10,8 +10,8 @@ import SwiftUI
 struct AddItemsView: View {
     @Environment(BillState.self) private var billState
     @Environment(\.dismiss) private var dismiss
-    
-    @State private var viewModel = CreateBillViewModel()
+
+    @State private var viewModel: CreateBillViewModel = .init()
     @State private var newItemName = ""
     @State private var newItemPrice = ""
     @State private var billName = ""
@@ -38,6 +38,9 @@ struct AddItemsView: View {
                         .foregroundStyle(.red)
                 }
             }
+        }
+        .onAppear {
+            viewModel.load(bill: billState.bill)
         }
     }
     
@@ -171,7 +174,7 @@ struct AddItemsView: View {
         .disabled(!viewModel.canProceed)
         .simultaneousGesture(TapGesture().onEnded {
             if viewModel.canProceed {
-                billState.bill = viewModel.createBill()
+                billState.bill = viewModel.createBill(bill: billState.bill)
             }
         })
     }
@@ -192,3 +195,4 @@ struct AddItemsView: View {
         newItemPrice = ""
     }
 }
+

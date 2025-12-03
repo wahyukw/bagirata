@@ -13,7 +13,7 @@ struct BillCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12){
             HStack(alignment: .top) {
-                Text(bill.name ?? "Unnamed Bill")
+                Text((bill.name?.trimmingCharacters(in: .whitespacesAndNewlines)).flatMap { $0.isEmpty ? nil : $0 } ?? "Unnamed Bill")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
@@ -68,3 +68,4 @@ struct BillCardView: View {
     return BillCardView(bill: bill)
         .padding()
 }
+

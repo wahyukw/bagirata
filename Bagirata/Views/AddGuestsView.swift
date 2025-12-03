@@ -20,28 +20,29 @@ struct AddGuestsView: View {
         VStack(spacing: 12){
             instructionsSection
             addGuestSection
-        }
-        .padding()
-        ScrollView(showsIndicators: false){
-            VStack(spacing: 12){
-                guestsListSection
-            }
-            .padding(.horizontal)
-        }
-        nextButton
-            .padding()
-            .navigationTitle("Add Guests")
-            .navigationBarTitleDisplayMode(.inline)
-            .alert("Error", isPresented: $showError){
-                Button("OK", role: .cancel){}
-            }message: {
-                Text(errorMessage)
-            }
-            .onAppear {
-                if viewModel == nil {
-                    viewModel = GuestViewModel(bill: billState.bill)
+            ScrollView(showsIndicators: false){
+                VStack{
+                    guestsListSection
                 }
             }
+            nextButton
+        }
+        .padding()
+        .navigationTitle("Add Guests")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("Error", isPresented: $showError){
+            Button("OK", role: .cancel){}
+        }message: {
+            Text(errorMessage)
+        }
+        .onAppear {
+            viewModel = GuestViewModel(bill: billState.bill)
+        }
+        .onDisappear {
+            if let vm = viewModel {
+                billState.bill = vm.bill
+            }
+        }
     }
     
     private var instructionsSection: some View{
