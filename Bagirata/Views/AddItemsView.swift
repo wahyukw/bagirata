@@ -8,15 +8,13 @@
 import SwiftUI
 
 struct AddItemsView: View {
-    @State private var viewModel = CreateBillViewModel()
-    @Binding var navigationPath: NavigationPath
-    let onComplete: (Bill) -> Void
+    @Environment(BillState.self) private var billState
+    @Environment(\.dismiss) private var dismiss
     
+    @State private var viewModel = CreateBillViewModel()
     @State private var newItemName = ""
     @State private var newItemPrice = ""
     @State private var billName = ""
-    
-    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         ScrollView(showsIndicators: false){
@@ -161,9 +159,7 @@ struct AddItemsView: View {
     }
     
     private var nextButton: some View{
-        Button{
-            goToAddGuests()
-        }label:{
+        NavigationLink(value: "addGuests") {
             Text("Next: Add Guests")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
@@ -173,6 +169,11 @@ struct AddItemsView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .disabled(!viewModel.canProceed)
+        .simultaneousGesture(TapGesture().onEnded {
+            if viewModel.canProceed {
+                billState.bill = viewModel.createBill()
+            }
+        })
     }
     
     private var canAddItem: Bool{
@@ -189,19 +190,5 @@ struct AddItemsView: View {
         
         newItemName = ""
         newItemPrice = ""
-    }
-    
-    private func goToAddGuests(){
-        let bill = viewModel.createBill()
-        navigationPath.append(bill)
-    }
-}
-
-#Preview {
-    NavigationStack{
-        AddItemsView(
-            navigationPath: .constant(NavigationPath()),
-            onComplete: { _ in }
-        )
     }
 }

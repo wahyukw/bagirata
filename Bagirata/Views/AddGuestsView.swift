@@ -2,30 +2,21 @@
 //  AddGuestsView.swift
 //  Bagirata
 //
-//  Created by Moladin on 1/12/2025.
+//  Created by Wahyu K on 1/12/2025.
 //
 
 import SwiftUI
 
 struct AddGuestsView: View {
-    @State private var viewModel: GuestViewModel
-    @Binding var navigationPath: NavigationPath
-    let onComplete: (Bill) -> Void
     
+    @Environment(BillState.self) private var billState
+    
+    @State private var viewModel: GuestViewModel?
     @State private var newGuestName = ""
     @State private var showError = false
     @State private var errorMessage = ""
     
-    @Environment(\.dismiss) private var dismiss
-    
-    init(bill: Bill, navigationPath: Binding<NavigationPath>, onComplete: @escaping (Bill) -> Void) {
-        _viewModel = State(initialValue: GuestViewModel(bill: bill))
-        _navigationPath = navigationPath
-        self.onComplete = onComplete
-    }
-    
     var body: some View {
-        
         VStack(spacing: 12){
             instructionsSection
             addGuestSection
@@ -39,13 +30,18 @@ struct AddGuestsView: View {
         }
         nextButton
             .padding()
-        .navigationTitle("Add Guests")
-        .navigationBarTitleDisplayMode(.inline)
-        .alert("Error", isPresented: $showError){
-            Button("OK", role: .cancel){}
-        }message: {
-            Text(errorMessage)
-        }
+            .navigationTitle("Add Guests")
+            .navigationBarTitleDisplayMode(.inline)
+            .alert("Error", isPresented: $showError){
+                Button("OK", role: .cancel){}
+            }message: {
+                Text(errorMessage)
+            }
+            .onAppear {
+                if viewModel == nil {
+                    viewModel = GuestViewModel(bill: billState.bill)
+                }
+            }
     }
     
     private var instructionsSection: some View{
@@ -76,7 +72,7 @@ struct AddGuestsView: View {
                 }
                 .disabled(!canAddGuest)
             }
-            if let validationMsg = viewModel.validationMessage{
+            if let vm = viewModel, let validationMsg = vm.validationMessage{
                 Text(validationMsg)
                     .font(.caption)
                     .foregroundStyle(.red)
@@ -86,11 +82,11 @@ struct AddGuestsView: View {
     
     private var guestsListSection: some View{
         VStack(alignment: .leading, spacing: 12) {
-            if !viewModel.bill.guests.isEmpty{
-                Text("Guests (\(viewModel.bill.guests.count))")
+            if let vm = viewModel, !vm.bill.guests.isEmpty{
+                Text("Guests (\(vm.bill.guests.count))")
                     .font(.headline)
                 
-                ForEach(Array(viewModel.bill.guests.enumerated()), id: \.element.id) {index, guest in
+                ForEach(Array(vm.bill.guests.enumerated()), id: \.element.id) {index, guest in
                     HStack(spacing: 12){
                         Image(guest.avatarImg)
                             .resizable()
@@ -103,7 +99,7 @@ struct AddGuestsView: View {
                         Spacer()
                         
                         Button(role: .destructive){
-                            viewModel.removeGuest(at: index)
+                            vm.removeGuest(at: index)
                         }label:{
                             Image(systemName: "trash")
                                 .foregroundStyle(.red)
@@ -118,60 +114,41 @@ struct AddGuestsView: View {
     }
     
     private var nextButton: some View{
-        Button{
-            goToAssignItems()
-        } label: {
+        NavigationLink(value: "assignItems") {
             Text("Next: Assign Items")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(viewModel.canProceed ? Color.black : Color.gray)
+                .background((viewModel?.canProceed ?? false) ? Color.black : Color.gray)
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .disabled(!viewModel.canProceed)
+        .disabled(!(viewModel?.canProceed ?? false))
+        .simultaneousGesture(TapGesture().onEnded {
+            if let vm = viewModel, vm.canProceed {
+                // Update shared bill state
+                billState.bill = vm.bill
+            }
+        })
     }
     
     private var canAddGuest: Bool {
-        viewModel.isNameValid(newGuestName)
+        viewModel?.isNameValid(newGuestName) ?? false
     }
     
     private func addGuest() {
+        guard let vm = viewModel else { return }
+        
         let trimmedName = newGuestName.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        if viewModel.isNameDuplicate(trimmedName){
+        if vm.isNameDuplicate(trimmedName){
             errorMessage = "'\(trimmedName)' is already in the list"
             showError = true
             return
         }
         
-        viewModel.addGuest(name: trimmedName)
+        vm.addGuest(name: trimmedName)
         
         newGuestName = ""
-    }
-    
-    private func goToAssignItems(){
-        navigationPath.append(viewModel.bill)
-    }
-}
-
-#Preview {
-    let john = Guest(name: "John", avatarImg: "avatar1")
-    let pizza = BillItem(name: "Pizza", price: 20.0, assignedTo: [])
-    
-    let bill = Bill(
-        name: "Test Bill",
-        taxAmount: 2.2,
-        tipAmount: 5.0,
-        guests: [],
-        items: [pizza]
-    )
-    
-    return NavigationStack {
-        AddGuestsView(
-            bill: bill,
-            navigationPath: .constant(NavigationPath()),
-            onComplete: { _ in }
-        )
     }
 }
