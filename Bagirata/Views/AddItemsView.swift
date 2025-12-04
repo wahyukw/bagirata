@@ -9,13 +9,19 @@ import SwiftUI
 
 struct AddItemsView: View {
     @Environment(BillState.self) private var billState
-    @Environment(\.modelContext) private var modelContext
+    
     @Environment(\.dismiss) private var dismiss
 
-    @State private var viewModel: CreateBillViewModel = .init()
+    @State private var viewModel: CreateBillViewModel?
     @State private var newItemName = ""
     @State private var newItemPrice = ""
     @State private var billName = ""
+    
+    @FocusState private var focusedField: Field?
+    private enum Field: Hashable {
+        case name
+        case price
+    }
     
     var body: some View {
         ScrollView(showsIndicators: false){
@@ -41,7 +47,14 @@ struct AddItemsView: View {
             }
         }
         .onAppear {
-            viewModel.load(bill: billState.bill)
+            if viewModel == nil{
+                viewModel = CreateBillViewModel(bill: billState.bill)
+                billName = viewModel?.billName ?? ""
+            }
+            focusedField = .name
+        }
+        .onDisappear{
+            viewModel?.saveBill()
         }
     }
     
@@ -55,40 +68,42 @@ struct AddItemsView: View {
             TextField("e.g. Dinner at John's", text: $billName)
                 .textFieldStyle(.roundedBorder)
                 .onChange(of: billName){ _, newValue in
-                    viewModel.billName =  newValue
+                    viewModel?.billName =  newValue
                 }
         }
     }
     
     private var itemsListSection: some View{
         VStack(alignment: .leading, spacing: 12) {
-            if(!viewModel.items.isEmpty){
+            if let vm = viewModel, !vm.bill.items.isEmpty{
                 Text("Items")
                     .font(.headline)
             }
             
-            ForEach(Array(viewModel.items.enumerated()), id: \.element.id){index, item in
-                HStack{
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(item.name)
-                            .font(.body)
-                        Text("$\(String(format: "%.2f", item.price))")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    
-                    Button(role: .destructive){
-                        viewModel.removeItem(at: index)
-                    }label: {
-                        Image(systemName: "trash")
-                            .foregroundStyle(.red)
+            if let vm = viewModel{
+                ForEach(Array(vm.bill.items.enumerated()), id: \.element.id){index, item in
+                    HStack{
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(item.name)
+                                .font(.body)
+                            Text("$\(String(format: "%.2f", item.price))")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        
+                        Button(role: .destructive){
+                            vm.removeItem(at: index)
+                        }label: {
+                            Image(systemName: "trash")
+                                .foregroundStyle(.red)
+                        }
                     }
                 }
+                .padding()
+                .background(Color(.systemGray6))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .padding()
-            .background(Color(.systemGray6))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
         }
     }
     
@@ -100,10 +115,12 @@ struct AddItemsView: View {
             VStack(spacing: 12){
                 TextField("Item name (e.g. Pizza)", text: $newItemName)
                     .textFieldStyle(.roundedBorder)
+                    .focused($focusedField, equals: .name)
                 
                 TextField("Price", text: $newItemPrice)
                     .textFieldStyle(.roundedBorder)
                     .keyboardType(.decimalPad)
+                    .focused($focusedField, equals: .price)
                 
                 Button{
                     addItem()
@@ -123,39 +140,45 @@ struct AddItemsView: View {
     
     private var billSummarySection: some View{
         VStack(spacing: 12){
-            HStack{
-                Text("Subtotal")
-                    .font(.body)
-                Spacer()
-                Text("$\(String(format: "%.2f", viewModel.subtotal))")
-                    .font(.body)
-            }
-            HStack{
-                Text("Tax (11%)")
-                    .font(.body)
-                Spacer()
-                Text("$\(String(format: "%.2f", viewModel.taxAmount))")
-                    .font(.body)
+            if let vm = viewModel{
+                HStack{
+                    Text("Subtotal")
+                        .font(.body)
+                    Spacer()
+                    Text("$\(String(format: "%.2f", vm.subtotal))")
+                        .font(.body)
+                }
+                HStack{
+                    Text("Tax (11%)")
+                        .font(.body)
+                    Spacer()
+                    Text("$\(String(format: "%.2f", vm.taxAmount))")
+                        .font(.body)
+                }
+                
+                HStack{
+                    Text("Tip")
+                        .font(.body)
+                    Spacer()
+                    TextField("$0.00", text: Binding(
+                        get: {vm.tipAmount},
+                        set: {vm.tipAmount = $0}
+                    ))
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 100)
+                        .textFieldStyle(.roundedBorder)
+                }
+                Divider()
+                HStack{
+                    Text("Total")
+                        .font(.headline)
+                    Spacer()
+                    Text("$\(String(format: "%.2f", vm.total))")
+                        .font(.headline)
+                }
             }
             
-            HStack{
-                Text("Tip")
-                    .font(.body)
-                Spacer()
-                TextField("$0.00", text: $viewModel.tipAmount)
-                    .keyboardType(.decimalPad)
-                    .multilineTextAlignment(.trailing)
-                    .frame(width: 100)
-                    .textFieldStyle(.roundedBorder)
-            }
-            Divider()
-            HStack{
-                Text("Total")
-                    .font(.headline)
-                Spacer()
-                Text("$\(String(format: "%.2f", viewModel.total))")
-                    .font(.headline)
-            }
         }
         .padding()
         .background(Color(.systemGray6))
@@ -168,15 +191,13 @@ struct AddItemsView: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(viewModel.canProceed ? Color.black : Color.gray)
+                .background((viewModel?.canProceed ?? false) ? Color.black : Color.gray)
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .disabled(!viewModel.canProceed)
+        .disabled(!(viewModel?.canProceed ?? false))
         .simultaneousGesture(TapGesture().onEnded {
-            if viewModel.canProceed {
-                billState.bill = viewModel.createBill(bill: billState.bill)
-            }
+            viewModel?.saveBill()
         })
     }
     
@@ -188,12 +209,15 @@ struct AddItemsView: View {
     }
     
     private func addItem(){
-        guard let price = Double(newItemPrice) else {return}
+        guard let vm = viewModel,
+              let price = Double(newItemPrice) else {return}
         
-        viewModel.addItem(name: newItemName, price: price)
+        vm.addItem(name: newItemName, price: price)
         
         newItemName = ""
         newItemPrice = ""
+        
+        focusedField = .name
     }
 }
 

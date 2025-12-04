@@ -28,6 +28,7 @@ struct CreateBillView: View {
                         bill: billState.bill,
                         onComplete: { finalBill in
                             onComplete(finalBill)
+                            billState.reset()
                             path = NavigationPath()
                         }
                     )

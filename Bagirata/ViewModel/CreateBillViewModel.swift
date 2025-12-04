@@ -10,13 +10,18 @@ import SwiftUI
 
 @Observable
 class CreateBillViewModel{
-    var items: [BillItem] = []
+    var bill: Bill
     var taxRate: Double = 0.11
     var tipAmount: String = ""
     var billName: String = ""
     
+    init(bill: Bill){
+        self.bill = bill
+        self.load()
+    }
+    
     var subtotal: Double{
-        items.reduce(0){$0 + $1.price}
+        bill.items.reduce(0){$0 + $1.price}
     }
     
     var taxAmount: Double {
@@ -32,29 +37,24 @@ class CreateBillViewModel{
     }
     
     var canProceed: Bool {
-        !items.isEmpty &&
+        !bill.items.isEmpty &&
         (tipAmount.isEmpty || Double(tipAmount) != nil)
     }
     
     func addItem(name: String, price: Double){
         let newItem = BillItem(name: name, price: price)
-        items.append(newItem)
+        bill.items.append(newItem)
     }
     
     func removeItem(at index: Int){
-        items.remove(at: index)
+        bill.items.remove(at: index)
     }
-    func createBill(bill: Bill) -> Bill {
-        let updatedBill = bill
-        
-        updatedBill.name = self.billName
-        updatedBill.items = self.items
-        updatedBill.taxAmount = self.taxAmount
-        updatedBill.tipAmount = self.tipAmountDouble
-        
-        return updatedBill
+    func saveBill(){
+        bill.name = self.billName.isEmpty ? nil : self.billName
+        bill.taxAmount = self.taxAmount
+        bill.tipAmount = self.tipAmountDouble
     }
-    func load(bill: Bill) {
+    func load() {
         let loadedName = bill.name ?? ""
         
         if loadedName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -63,6 +63,7 @@ class CreateBillViewModel{
             self.billName = loadedName
         }
         
-        self.items = bill.items
+        self.tipAmount = bill.tipAmount > 0 ? String(bill.tipAmount) : ""
     }
 }
+

@@ -15,4 +15,8 @@ class BillState{
     init() {
         self.bill = Bill()
     }
+    
+    func reset(){
+        self.bill = Bill()
+    }
 }
