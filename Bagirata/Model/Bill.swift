@@ -6,14 +6,20 @@
 //
 
 import Foundation
+import SwiftData
 
-struct Bill:Identifiable, Hashable{
-    let id: UUID
+@Model
+class Bill:Identifiable, Hashable{
+    var id: UUID
     var name: String?
     var date: Date
     var taxAmount: Double
     var tipAmount: Double
+    
+    @Relationship(deleteRule: .cascade, inverse: \Guest.bill)
     var guests: [Guest]
+    
+    @Relationship(deleteRule: .cascade, inverse: \BillItem.bill)
     var items: [BillItem]
     
     //Sum of all item prices before tax and tip

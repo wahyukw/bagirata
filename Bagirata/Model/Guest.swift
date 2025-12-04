@@ -6,11 +6,15 @@
 //
 
 import Foundation
+import SwiftData
 
-struct Guest: Identifiable, Hashable, Equatable {
-    let id: UUID
+@Model
+class Guest: Identifiable, Hashable, Equatable {
+    var id: UUID
     var name: String
     var avatarImg: String
+    
+    var bill: Bill?
     
     init(
         id: UUID = UUID(),

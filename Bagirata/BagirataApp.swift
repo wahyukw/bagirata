@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import SwiftData
 
 @main
 struct BagirataApp: App {
@@ -14,6 +14,6 @@ struct BagirataApp: App {
         WindowGroup {
             HomeView()
         }
-        
+        .modelContainer(for: Bill.self)
     }
 }

@@ -6,12 +6,18 @@
 //
 
 import Foundation
+import SwiftData
 
-struct BillItem: Identifiable, Equatable, Hashable {
-    let id: UUID
+@Model
+class BillItem: Identifiable, Equatable, Hashable {
+    var id: UUID
     var name: String
     var price: Double
+    
+    @Relationship(deleteRule: .nullify)
     var assignedTo: [Guest]
+    
+    var bill: Bill?
     
     var isAssigned:Bool{
         !assignedTo.isEmpty

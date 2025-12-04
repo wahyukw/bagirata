@@ -36,17 +36,12 @@ class AssignItemsViewModel{
         //Find item index in the bill
         guard let index = bill.items.firstIndex(where: {$0.id == item.id}) else{return}
         
-        var updatedItem = bill.items[index]
-        
         //Check if guest is already assigned, if yes, then remove / toggle off, else append to assignedTo array
-        if let guestIndex = updatedItem.assignedTo.firstIndex(where: {$0.id == guest.id}){
-            updatedItem.assignedTo.remove(at: guestIndex)
+        if let guestIndex = bill.items[index].assignedTo.firstIndex(where: {$0.id == guest.id}){
+                bill.items[index].assignedTo.remove(at: guestIndex)
+        } else {
+            bill.items[index].assignedTo.append(guest)
         }
-        else{
-            updatedItem.assignedTo.append(guest)
-        }
-        
-        bill.items[index] = updatedItem
     }
     
     func isGuestAssignedToItem(guest: Guest, item: BillItem) -> Bool {

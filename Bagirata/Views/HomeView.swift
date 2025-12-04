@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
-
+import SwiftData
 
 struct HomeView: View {
-    @State private var bills: [Bill] = []
+    
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \Bill.date, order: .reverse) private var bills: [Bill]
+    
     @State private var showCreateBill = false
     
     var body: some View {
@@ -37,7 +40,7 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showCreateBill) {
                 CreateBillView(onComplete: {bill in
-                    bills.append(bill)
+                    modelContext.insert(bill)
                     showCreateBill = false
                 })
             }
@@ -65,21 +68,33 @@ struct HomeView: View {
         }
     }
     
-    private var BillListView: some View{
-        ScrollView(showsIndicators: false){
-            LazyVStack(spacing: 16){
-                ForEach(bills){ bill in
+    private var BillListView: some View {
+        List {
+            ForEach(bills) { bill in
+                ZStack(alignment: .leading) {
                     NavigationLink(value: bill) {
-                        BillCardView(bill: bill)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .contentShape(Rectangle())
+                        EmptyView()
                     }
-                    .buttonStyle(.plain)
+                    .opacity(0)
+                    
+                    BillCardView(bill: bill)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        deleteBill(bill)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
                 }
             }
-            .padding()
-            .padding(.bottom, 80)
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
     
     private var AddButton: some View{
@@ -96,8 +111,13 @@ struct HomeView: View {
                 .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
         }
     }
+    
+    private func deleteBill(_ bill: Bill){
+        modelContext.delete(bill)
+    }
 }
 
 #Preview {
     HomeView()
+        .modelContainer(for: Bill.self, inMemory: true)
 }

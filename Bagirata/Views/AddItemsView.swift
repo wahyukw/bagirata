@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AddItemsView: View {
     @Environment(BillState.self) private var billState
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
     @State private var viewModel: CreateBillViewModel = .init()

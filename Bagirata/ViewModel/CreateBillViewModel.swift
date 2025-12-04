@@ -45,7 +45,7 @@ class CreateBillViewModel{
         items.remove(at: index)
     }
     func createBill(bill: Bill) -> Bill {
-        var updatedBill = bill
+        let updatedBill = bill
         
         updatedBill.name = self.billName
         updatedBill.items = self.items
