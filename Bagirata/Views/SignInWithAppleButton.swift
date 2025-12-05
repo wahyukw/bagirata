@@ -98,12 +98,17 @@ struct SignInWithAppleButtonViewRepresentable: UIViewRepresentable {
         }
         
         func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-            guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene, let window = scene.windows.first else{
+            guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                  let window = scene.keyWindow else {
+                
+                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                    return UIWindow(windowScene: windowScene)
+                }
+                
                 return UIWindow()
             }
             return window
         }
-        
     }
 }
 
