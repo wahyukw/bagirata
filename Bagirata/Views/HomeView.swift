@@ -11,6 +11,8 @@ import SwiftData
 struct HomeView: View {
     
     @Environment(\.modelContext) private var modelContext
+    @Environment(AuthenticationManager.self) private var authManager
+    
     @Query(sort: \Bill.date, order: .reverse) private var bills: [Bill]
     
     @State private var showCreateBill = false
@@ -35,6 +37,20 @@ struct HomeView: View {
                 }
             }
             .navigationTitle("My Bills")
+            .toolbar{
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu{
+                        Button(role: .destructive){
+                            authManager.signOut()
+                        } label: {
+                            Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                        }
+                    } label:{
+                        Image(systemName: "person.circle")
+                            .font(.title3)
+                    }
+                }
+            }
             .navigationDestination(for: Bill.self) { bill in
                 ResultsView(bill: bill, onComplete: { _ in })
             }
@@ -115,9 +131,4 @@ struct HomeView: View {
     private func deleteBill(_ bill: Bill){
         modelContext.delete(bill)
     }
-}
-
-#Preview {
-    HomeView()
-        .modelContainer(for: Bill.self, inMemory: true)
 }

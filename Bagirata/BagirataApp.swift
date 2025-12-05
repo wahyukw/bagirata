@@ -10,10 +10,36 @@ import SwiftData
 
 @main
 struct BagirataApp: App {
+    
+    @State private var authManager = AuthenticationManager()
+    
+    var sharedModelContainer: ModelContainer = {
+        let schema = Schema([
+            Bill.self,
+            BillItem.self,
+            Guest.self
+        ])
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        
+        do{
+            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+        }catch{
+            fatalError("Could not initialize ModelContainer: \(error.localizedDescription)")
+        }
+    }()
+    
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            Group{
+                if authManager.isAuthenticated{
+                    HomeView()
+                        .modelContainer(sharedModelContainer)
+                }
+                else{
+                    LoginView()
+                }
+            }
         }
-        .modelContainer(for: Bill.self)
+        .environment(authManager)
     }
 }
