@@ -35,8 +35,10 @@ struct BagirataApp: App {
                     HomeView()
                         .modelContainer(sharedModelContainer)
                 }
-                else{
+                else if authManager.hasCompletedOnboarding {
                     LoginView()
+                } else{
+                    OnboardingView()
                 }
             }
         }

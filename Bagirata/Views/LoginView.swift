@@ -35,7 +35,7 @@ struct LoginView: View {
                     .frame(height: 50)
                     .padding(.horizontal, 40)
                 
-                Text("Your data styas private and secure")
+                Text("Your data stays private and secure")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
